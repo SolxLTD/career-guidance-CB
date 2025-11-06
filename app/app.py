@@ -13,7 +13,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize, word_tokenize
 
 
-with open("career_text.txt", "r", encoding="utf-8") as f:
+with open("../career_text.txt", "r", encoding="utf-8") as f:
     raw_text = f.read().lower()
 
 
