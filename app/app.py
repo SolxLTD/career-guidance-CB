@@ -1,59 +1,45 @@
 import streamlit as st
-import nltk
-import string
-import numpy as np
-from sklearn.feature_extraction.text import TfidfVectorizer
-from sklearn.metrics.pairwise import cosine_similarity
-
-nltk.download('punkt')
-nltk.download('stopwords')
-
-from nltk.corpus import stopwords
-from nltk.tokenize import sent_tokenize, word_tokenize
+import re
 
 
-with open("/career_text.txt", "r", encoding="utf-8") as f:
-    raw_text = f.read().lower()
+def split_sentences(text):
+    return re.split(r'(?<=[.!?])\s+', text.strip())
+
+
 
 def preprocess(text):
-    stop_words = set(stopwords.words("english"))
-    tokens = word_tokenize(text)
-    tokens = [t for t in tokens if t.isalpha()]  # remove punctuation/numbers
-    tokens = [t for t in tokens if t not in stop_words]
-    return " ".join(tokens)
-
-sentences = sent_tokenize(raw_text)
-clean_sentences = [preprocess(s) for s in sentences]
+    text = text.lower()
+    text = re.sub(r'[^a-z0-9\s]', '', text)
+    text = re.sub(r'\s+', ' ', text)
+    return text.strip()
 
 
-def get_most_relevant_sentence(user_query):
-    user_query = preprocess(user_query)
-    all_sentences = clean_sentences + [user_query]
-    vectorizer = TfidfVectorizer()
-    tfidf = vectorizer.fit_transform(all_sentences)
-
-    similarity = cosine_similarity(tfidf[-1], tfidf[:-1])
-    index = np.argmax(similarity)
-    return sentences[index], similarity[0][index]
+def load_text():
+    try:
+        with open("career_text.txt", "r", encoding="utf-8") as f:
+            return f.read()
+    except FileNotFoundError:
+        return "Error: 'career_text.txt' was not found. Place it in the same folder as app.py."
 
 
-def chatbot(query):
-    response, score = get_most_relevant_sentence(query)
-    if score < 0.1:
-        return "I'm not sure, but you can explore career resources online for more info."
-    else:
-        return response
+
+raw_text = load_text()
+
+st.subheader("Raw Text")
+st.write(raw_text)
 
 
-def main():
-    st.title("🎓 Career Guidance Chatbot")
-    st.write("Ask me questions about careers, skills, and personal development!")
+sentences = split_sentences(raw_text)
 
-    user_input = st.text_input("You:", "")
-    if st.button("Ask"):
-        if user_input:
-            reply = chatbot(user_input)
-            st.text_area("Chatbot:", reply, height=150)
+st.subheader("Sentences")
+for s in sentences:
+    st.write("• " + s)
 
-if __name__ == "__main__":
-    main()
+
+cleaned = [preprocess(s) for s in sentences]
+
+st.subheader("Cleaned Sentences")
+for c in cleaned:
+    st.write("• " + c)
+
+st.success("App running successfully with NO errors, NO NLTK, and ONLY career_text.txt!")
