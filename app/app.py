@@ -5,7 +5,6 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 
-# --- Download NLTK resources ---
 nltk.download('punkt')
 nltk.download('stopwords')
 
@@ -13,7 +12,7 @@ from nltk.corpus import stopwords
 from nltk.tokenize import sent_tokenize, word_tokenize
 
 
-with open("app/career_text.txt", "r", encoding="utf-8") as f:
+with open("/career_text.txt", "r", encoding="utf-8") as f:
     raw_text = f.read().lower()
 
 def preprocess(text):
